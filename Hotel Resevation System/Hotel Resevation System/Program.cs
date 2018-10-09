@@ -49,7 +49,7 @@ namespace HotelResevationSystem
             }
             Console.WriteLine($"totalrooms:{roomList.Count}");
           
-            foreach (var room in sortedRooms)
+            foreach (var room in roomList)
             {
                 Console.WriteLine($"roomid:{room.ID},roomtype:{room.Type},price:{room.Price}");
             }
