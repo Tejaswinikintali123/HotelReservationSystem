@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Hotel Resevation System/.vs/Hotel Resevation System/v14
+/Hotel Resevation System/Hotel Resevation System/obj/Debug
+/Hotel Resevation System/Hotel Resevation System/bin/Debug
