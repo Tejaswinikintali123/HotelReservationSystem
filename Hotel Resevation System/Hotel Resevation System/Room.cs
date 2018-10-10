@@ -6,22 +6,18 @@ using System.Threading.Tasks;
 
 namespace HotelResevationSystem
 {
-    class Room
+    public enum Roomtype
     {
-        
-        public int ID { get; private set; }
-        public string Type { get; set; }
-        public double Price { get; private set; }
-
-        public Room(int roomId,string roomType, double price)
-        {
-            ID = roomId;
-            Type = roomType;
-            this.Price = price;
-            
-        }
-        
-
-
+        king,
+        Queen,
+        Twin,
+        single
+    }
+    public class Room
+    {
+        public int ID { get; set; }
+        public Roomtype Type { get; set; }
+        public double Price { get;  set; }
+        public bool IsBooked { get; set; }
     }
 }
