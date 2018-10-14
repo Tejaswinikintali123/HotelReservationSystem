@@ -13,11 +13,14 @@ namespace HotelResevationSystem
         Twin,
         single
     }
+   
     public class Room
     {
+        #region properties
         public int ID { get; set; }
         public Roomtype Type { get; set; }
         public double Price { get;  set; }
         public bool IsBooked { get; set; }
+        #endregion
     }
 }

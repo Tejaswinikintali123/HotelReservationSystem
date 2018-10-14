@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace HotelResevationSystem
 {
+    /// <summary>
+    /// Bookings class
+    /// </summary>
     public class Booking
     {
         private  Dictionary<int,Room> roomList = new Dictionary<int,Room>();
+        /// <summary>
+        /// Booking class constructor
+        /// </summary>
         public Booking()
         {
             
@@ -18,6 +24,13 @@ namespace HotelResevationSystem
         {
             return roomList.Values.ToList();
         }
+        #region methods
+
+        /// <summary>
+        /// List of all availablerooms with the selection of Roomtype
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></"availablerooms">
         public List<Room> GetAvailableRooms(Roomtype type)
         {
             var availablerooms =  new List<Room>();
@@ -31,6 +44,11 @@ namespace HotelResevationSystem
             }
             return availablerooms;
         }
+        /// <summary>
+        ///Booking a room 
+        /// </summary>
+        /// <param name="roomno"></param>
+        /// <returns></true/false>
         public bool BookRoom(int roomno)
         {
             if(roomList.Keys.Contains(roomno) == true && roomList[roomno].IsBooked == false)
@@ -40,6 +58,11 @@ namespace HotelResevationSystem
             }
             return false;
         }
+        /// <summary>
+        /// populate rooms with respective of nooffloors & noofroomsperfloor
+        /// </summary>
+        /// <param name="noOfFloors"></param>
+        /// <param name="noOfRoomsPerFloor"></param>
         public void PopulateRooms(int noOfFloors, int noOfRoomsPerFloor)
         {
             for (int i = 1; i <= noOfRoomsPerFloor; i++)
@@ -81,6 +104,7 @@ namespace HotelResevationSystem
                 }
             }
         }
+        #endregion
     }
 }
 
