@@ -12,7 +12,10 @@ namespace HotelResevationSystem
     /// </summary>
     public class Booking
     {
-        private  Dictionary<int,Room> roomList = new Dictionary<int,Room>();
+        private Dictionary<int, BookingDetails> bookingList = new Dictionary<int , BookingDetails>();
+        private Dictionary<int,Room> roomList = new Dictionary<int,Room>();
+        private IEnumerable<KeyValuePair<RoomType, int>> groupByRoomList;
+
         /// <summary>
         /// Booking class constructor
         /// </summary>
@@ -27,36 +30,54 @@ namespace HotelResevationSystem
         #region methods
 
         /// <summary>
-        /// List of all availablerooms with the selection of Roomtype
+        /// method to book a room
         /// </summary>
         /// <param name="type"></param>
-        /// <returns></"availablerooms">
-        public List<Room> GetAvailableRooms(Roomtype type)
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="startdate"></param>
+        /// <param name="enddate"></param>
+        /// <returns></returns>
+        public BookingDetails BookRoom(RoomType type,string name,string email,DateTime startdate,DateTime enddate)
         {
-            var availablerooms =  new List<Room>();
-            var rooms = GetAllRooms();
-            foreach(Room r in rooms )
-            {
-                if (r.Type == type && r.IsBooked==false) 
-                {
-                    availablerooms.Add(r);
-                }
-            }
-            return availablerooms;
+            var details = new BookingDetails();
+            details.Type = type;
+            details.ID = bookingList.Values.Count == 0 ? 1 : bookingList.Values.Max(x=>x.ID) + 1;
+            details.Name = name;
+            details.EmailAddress = email;
+            details.StartDate = startdate;
+            details.EndDate = enddate;
+            bookingList.Add(details.ID, details);
+            return details;
         }
-        /// <summary>
-        ///Booking a room 
-        /// </summary>
-        /// <param name="roomno"></param>
-        /// <returns></true/false>
-        public bool BookRoom(int roomno)
+        public BookingDetails GetBookingDetails(int id)
         {
-            if(roomList.Keys.Contains(roomno) == true && roomList[roomno].IsBooked == false)
-            {
-                roomList[roomno].IsBooked = true;
-                return true;
+            if(this.bookingList.ContainsKey(id) == true)
+                return this.bookingList[id];
+            return null;
+        }
+
+        /// <summary>
+        /// method to search rooms
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public List<BookingSearchResult> SearchAvialableRooms(DateTime startDate, DateTime endDate)
+        {
+            List<BookingSearchResult> results = new List<BookingSearchResult>();
+            
+            var groupByBookingDetails = this.bookingList.Values.Where(x =>startDate>= x.StartDate.Date && endDate<= x.EndDate.Date ).GroupBy(x => x.Type)
+                 .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
+            foreach (var pair in this.groupByRoomList) {
+                var result = new BookingSearchResult();
+                result.Type = pair.Key;
+                var bookDetails = groupByBookingDetails.FirstOrDefault(x => x.Key == pair.Key);
+                result.AvailableRoomCount = pair.Value - bookDetails.Value;
+                result.RoomPrice = this.roomList.Values.Where(x => x.Type == pair.Key).FirstOrDefault().Price;
+                results.Add(result);
             }
-            return false;
+            return results;
         }
         /// <summary>
         /// populate rooms with respective of nooffloors & noofroomsperfloor
@@ -68,30 +89,30 @@ namespace HotelResevationSystem
             for (int i = 1; i <= noOfRoomsPerFloor; i++)
             {
                 var price = 0;
-                var type = Roomtype.king;
+                var type = RoomType.King;
                 switch (i)
                 {
                     case 1:
                     case 5:
                         price = 200;
-                        type = Roomtype.king;
+                        type = RoomType.King;
                         break;
                     case 2:
                     case 6:
                     case 9:
                         price = 100;
-                        type = Roomtype.Queen;
+                        type = RoomType.Queen;
                         break;
                     case 3:
                     case 7:
                         price = 150;
-                        type = Roomtype.Twin;
+                        type = RoomType.Twin;
                         break;
                     case 4:
                     case 10:
                     case 8:
                         price = 100;
-                        type = Roomtype.single;
+                        type = RoomType.Single;
                         break;
                 }
                 for (int k = 100; k <= noOfFloors * 100; k += 100)
@@ -103,6 +124,8 @@ namespace HotelResevationSystem
                     roomList.Add(room.ID, room);
                 }
             }
+            this.groupByRoomList = this.roomList.Values.GroupBy(x => x.Type)
+                .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
         }
         #endregion
     }
