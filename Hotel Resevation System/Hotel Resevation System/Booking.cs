@@ -38,23 +38,29 @@ namespace HotelResevationSystem
         /// <param name="startdate"></param>
         /// <param name="enddate"></param>
         /// <returns></returns>
-        public BookingDetails BookRoom(RoomType type,string name,string email,DateTime startdate,DateTime enddate)
+        public BookingDetails BookRoom(RoomType type, string name, string email, DateTime startdate, DateTime enddate)
         {
+
+            this.ValidateParameters(email, startdate, enddate);
             var details = new BookingDetails();
             details.Type = type;
-            details.ID = bookingList.Values.Count == 0 ? 1 : bookingList.Values.Max(x=>x.ID) + 1;
+            details.ID = bookingList.Values.Count == 0 ? 1 : bookingList.Values.Max(x => x.ID) + 1;
             details.Name = name;
             details.EmailAddress = email;
             details.StartDate = startdate;
             details.EndDate = enddate;
             bookingList.Add(details.ID, details);
             return details;
-        }
-        public BookingDetails GetBookingDetails(int id)
+
+            
+        } 
+       public BookingDetails GetBookingDetails(int id)
         {
-            if(this.bookingList.ContainsKey(id) == true)
+            if (this.bookingList.ContainsKey(id) == true)
                 return this.bookingList[id];
-            return null;
+            
+              
+            throw new BookingException("Booking ID does not exist");
         }
 
         /// <summary>
@@ -126,6 +132,37 @@ namespace HotelResevationSystem
             }
             this.groupByRoomList = this.roomList.Values.GroupBy(x => x.Type)
                 .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
+        }
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private void ValidateParameters(string email,DateTime startdate,DateTime enddate)
+        {
+            if (enddate<=startdate)
+            {
+                throw new BookingException("Error code:100","Enddate should be greater than to startdate");
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email address is required");
+            }
+            if (!IsValidEmail(email))
+            {
+                throw new FormatException("Please enter a valid email address.");
+            }
+           
+           
+           
         }
         #endregion
     }
