@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelResevationSystem
+namespace HotelReservationSystemModels
 {
-    class BookingException:Exception
+   public class BookingException:Exception
     {
         public BookingException():base("end date should be greater than start date")
         {
