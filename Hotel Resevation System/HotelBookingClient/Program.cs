@@ -13,7 +13,7 @@ namespace HotelBookingClient
         static void Main(string[] args)
         {
             var b = new Booking();
-            b.PopulateRooms(3, 5);
+            //b.PopulateRooms(3, 5); // This is onetime job to populate rooms master data
             Console.WriteLine("WELCOME TO MY NEW HOTEL");
             while (true)
             {

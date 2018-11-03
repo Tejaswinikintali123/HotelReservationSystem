@@ -21,3 +21,6 @@
 /Hotel Resevation System/HotelBookingFactory/obj
 /Hotel Resevation System/HotelBookingClient/bin/Debug/netcoreapp2.1
 /Hotel Resevation System/HotelBookingClient/obj
+/Hotel Resevation System/HotelBookingDBLayer/bin/Debug/netcoreapp2.1
+/Hotel Resevation System/HotelBookingDBLayer/Migrations
+/Hotel Resevation System/HotelBookingDBLayer/obj
