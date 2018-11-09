@@ -10,6 +10,7 @@ namespace HotelBookingDBLayer
         public DbSet<Room> Rooms { get; set; }
       
         public DbSet<BookingDetails> BookingDetailsofRoom{get; set; }
+        public DbSet<CheckIn> CheckIn { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer
@@ -35,8 +36,11 @@ namespace HotelBookingDBLayer
 
             });
 
-
-
+            modelBuilder.Entity<CheckIn>(entity =>
+            {
+                entity.HasKey(x => new { x.BookingId, x.RoomId })
+                    .HasName("PK_BookingId_RoomId");
+            });
         }
     }
 }

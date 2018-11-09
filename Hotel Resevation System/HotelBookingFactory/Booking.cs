@@ -22,8 +22,15 @@ namespace HotelBookingFactory
         /// </summary>
         public Booking()
         {
-            
+            PopulateRoomList();
         }
+
+        private void PopulateRoomList()
+        {
+            this.groupByRoomList = this.db.Rooms.GroupBy(x => x.Type)
+                .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
+        }
+
         private List<Room> GetAllRooms()
         {
             return db.Rooms.ToList();
@@ -44,8 +51,9 @@ namespace HotelBookingFactory
 
             this.ValidateParameters(email, startdate, enddate);
             var details = new BookingDetails();
+
             details.Type = type;
-           /// details.ID = bookingList.Values.Count == 0 ? 1 : bookingList.Values.Max(x => x.ID) + 1;
+ 
             details.Name = name;
             details.EmailAddress = email;
             details.StartDate = startdate;
@@ -53,10 +61,28 @@ namespace HotelBookingFactory
            var detailsResult= db.BookingDetailsofRoom.Add(details);
             db.SaveChanges();
             return detailsResult.Entity;
-            
-
-            
         } 
+        public int CheckIn(int bookingId)
+        {
+            var details = this.GetBookingDetails(bookingId);
+
+            var room = this.db.Rooms.Where(x => x.Type == details.Type).FirstOrDefault();
+            var checkIn = new CheckIn();
+            checkIn.BookingId = bookingId;
+            checkIn.RoomId = room.ID;
+            checkIn.CheckInTime = DateTime.Now;
+            db.CheckIn.Add(checkIn);
+            db.SaveChanges();
+            return room.RoomNo;
+
+        }
+        public void CheckOut(int roomNo)
+        {
+            var room = this.db.Rooms.Where(x => x.RoomNo == roomNo).FirstOrDefault();
+            var checkin = this.db.CheckIn.Where(x => x.RoomId == room.ID && x.CheckOutTime == null).FirstOrDefault();
+            checkin.CheckOutTime = DateTime.Now;
+            db.SaveChanges();
+        }
        public BookingDetails GetBookingDetails(int id)
         {
            var existingDetails= this.db.BookingDetailsofRoom.Where(x => x.ID == id).FirstOrDefault();
@@ -64,7 +90,7 @@ namespace HotelBookingFactory
                 return existingDetails;
             
               
-            throw new BookingException("Booking ID does not exist");
+            throw new BookingException($"Booking ID {id} does not exist");
         }
 
         /// <summary>
@@ -136,8 +162,7 @@ namespace HotelBookingFactory
                 }
                 db.SaveChanges();
             }
-            this.groupByRoomList = this.db.Rooms.GroupBy(x => x.Type)
-                .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
+            PopulateRoomList();
         }
         private static bool IsValidEmail(string email)
         {

@@ -20,7 +20,9 @@ namespace HotelBookingClient
                 Console.WriteLine("1.SEARCH AVAILABLE ROOMS");
                 Console.WriteLine("2.BOOK A ROOM");
                 Console.WriteLine("3.SEARCH BOOKING DETAILS");
-                Console.WriteLine("4.EXIT");
+                Console.WriteLine("4.CHECKIN BY BOOKINGID");
+                Console.WriteLine("4.CHECKOUT BY ROOMNO");
+                Console.WriteLine("5.EXIT");
                 Console.Write("please select an option:");
                 var option = Console.ReadLine();
                 switch (option)
@@ -103,6 +105,25 @@ namespace HotelBookingClient
                         }
                         break;
                     case "4":
+                        try
+                        {
+                            Console.Write("Enter booking ID:");
+                            var ID = Convert.ToInt32(Console.ReadLine());
+                            var details = b.CheckIn(ID);
+                            Console.WriteLine("RoomNo: {0}", details);
+                        }
+                        catch (BookingException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        break;
+                    case "5":
+                        Console.Write("Enter Room No:");
+                        var roomNo = Convert.ToInt32(Console.ReadLine());
+                        b.CheckOut(roomNo);
+                        Console.WriteLine("RoomNo: {0} successfully checked out.", roomNo);
+                        break;
+                    case "6":
                         return;
                     default:
                         break;
