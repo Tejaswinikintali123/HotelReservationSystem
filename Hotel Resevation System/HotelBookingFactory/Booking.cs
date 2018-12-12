@@ -22,16 +22,16 @@ namespace HotelBookingFactory
         /// </summary>
         public Booking()
         {
-            PopulateRoomList();
+            FetchRoomList();
         }
 
-        private void PopulateRoomList()
+        private void FetchRoomList()
         {
             this.groupByRoomList = this.db.Rooms.GroupBy(x => x.Type)
                 .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
         }
 
-        private List<Room> GetAllRooms()
+        public List<Room> GetAllRooms()
         {
             return db.Rooms.ToList();
         }
@@ -53,12 +53,12 @@ namespace HotelBookingFactory
             var details = new BookingDetails();
 
             details.Type = type;
- 
+  
             details.Name = name;
             details.EmailAddress = email;
             details.StartDate = startdate;
             details.EndDate = enddate;
-           var detailsResult= db.BookingDetailsofRoom.Add(details);
+            var detailsResult= db.BookingDetailsofRoom.Add(details);
             db.SaveChanges();
             return detailsResult.Entity;
         } 
@@ -83,7 +83,7 @@ namespace HotelBookingFactory
             checkin.CheckOutTime = DateTime.Now;
             db.SaveChanges();
         }
-       public BookingDetails GetBookingDetails(int id)
+        public BookingDetails GetBookingDetails(int id)
         {
            var existingDetails= this.db.BookingDetailsofRoom.Where(x => x.ID == id).FirstOrDefault();
             if (existingDetails != null)
@@ -91,6 +91,12 @@ namespace HotelBookingFactory
             
               
             throw new BookingException($"Booking ID {id} does not exist");
+        }
+
+        public IEnumerable<BookingDetails> GetBookingDetails(string emailAddress)
+        {
+            var result = this.db.BookingDetailsofRoom.Where(x => x.EmailAddress.ToLower() == emailAddress.ToLower());
+            return result;
         }
 
         /// <summary>
@@ -101,6 +107,7 @@ namespace HotelBookingFactory
         /// <returns></returns>
         public List<BookingSearchResult> SearchAvialableRooms(DateTime startDate, DateTime endDate)
         {
+            this.ValidateDates(startDate, endDate);
             List<BookingSearchResult> results = new List<BookingSearchResult>();
             
             var groupByBookingDetails = this.db.BookingDetailsofRoom.Where(x =>startDate>= x.StartDate.Date && endDate<= x.EndDate.Date ).GroupBy(x => x.Type)
@@ -162,7 +169,7 @@ namespace HotelBookingFactory
                 }
                 db.SaveChanges();
             }
-            PopulateRoomList();
+            FetchRoomList();
         }
         private static bool IsValidEmail(string email)
         {
@@ -182,18 +189,14 @@ namespace HotelBookingFactory
             {
                 throw new BookingException("Error code:100","Enddate should be greater than to startdate");
             }
-
-            if (string.IsNullOrEmpty(email))
+            this.ValidateDates(startdate, enddate);
+        }
+        private void ValidateDates(DateTime startdate, DateTime enddate)
+        {
+            if (enddate <= startdate)
             {
-                throw new ArgumentNullException(nameof(email), "Email address is required");
+                throw new BookingException("Error code:100", "Enddate should be greater than to startdate");
             }
-            if (!IsValidEmail(email))
-            {
-                throw new FormatException("Please enter a valid email address.");
-            }
-           
-           
-           
         }
         #endregion
     }

@@ -21,8 +21,8 @@ namespace HotelBookingClient
                 Console.WriteLine("2.BOOK A ROOM");
                 Console.WriteLine("3.SEARCH BOOKING DETAILS");
                 Console.WriteLine("4.CHECKIN BY BOOKINGID");
-                Console.WriteLine("4.CHECKOUT BY ROOMNO");
-                Console.WriteLine("5.EXIT");
+                Console.WriteLine("5.CHECKOUT BY ROOMNO");
+                Console.WriteLine("6.EXIT");
                 Console.Write("please select an option:");
                 var option = Console.ReadLine();
                 switch (option)
