@@ -1,5 +1,6 @@
 ﻿using HotelBookingDBLayer;
 using HotelReservationSystemModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,11 +63,63 @@ namespace HotelBookingFactory
             db.SaveChanges();
             return detailsResult.Entity;
         } 
+        public List<CheckIn> GetAvailableRoomsForCheckOut()
+        {
+           return db.CheckIn.Where(x => x.CheckOutTime == null).Include(x=>x.Room).Include(x=>x.BookingDetails).ToList();
+            
+        }
+        public List<Room> GetAvailableRoomsForCheckin(int bookingId)
+        {
+            var existingCheckin = db.CheckIn.Where(x => x.BookingId == bookingId).FirstOrDefault();
+            if (existingCheckin != null)
+                throw new BookingException("Already CheckedIn");
+            var rooms = new List<Room>();
+            var details = this.GetBookingDetails(bookingId);
+
+            var allRooms = this.db.Rooms.Where(x => x.Type == details.Type);
+            
+            foreach (var room in allRooms)
+            {
+                var checkInRoomCount = this.db.CheckIn.Where(x => x.RoomId == room.ID && x.CheckOutTime == null).Count();
+                if (checkInRoomCount == 0)
+                {
+                    rooms.Add(room);
+                }
+            }
+            return rooms;
+        }
+
+        public int CheckIn(int bookingId,int roomId)
+        {
+            var details = this.GetBookingDetails(bookingId);
+
+            var room = this.db.Rooms.Where(x => x.ID == roomId).FirstOrDefault();
+            
+            var checkIn = new CheckIn();
+            checkIn.BookingId = bookingId;
+            checkIn.RoomId = room.ID;
+            checkIn.CheckInTime = DateTime.Now;
+            db.CheckIn.Add(checkIn);
+            db.SaveChanges();
+            return room.RoomNo;
+
+        }
+
         public int CheckIn(int bookingId)
         {
             var details = this.GetBookingDetails(bookingId);
 
-            var room = this.db.Rooms.Where(x => x.Type == details.Type).FirstOrDefault();
+            var allRooms = this.db.Rooms.Where(x => x.Type == details.Type);
+            Room room = allRooms.FirstOrDefault();
+            foreach(var r in allRooms)
+            {
+                var checkInRoomCount = this.db.CheckIn.Where(x => x.RoomId == room.ID && x.CheckOutTime == null).Count();
+                if(checkInRoomCount == 0)
+                {
+                    room = r;
+                    break;
+                }
+            }
             var checkIn = new CheckIn();
             checkIn.BookingId = bookingId;
             checkIn.RoomId = room.ID;

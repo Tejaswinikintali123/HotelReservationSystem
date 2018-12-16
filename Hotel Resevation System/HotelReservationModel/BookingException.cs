@@ -16,7 +16,7 @@ namespace HotelReservationSystemModels
         {
 
         }
-        public BookingException(string message):base()
+        public BookingException(string message):base(message)
         {
 
         }

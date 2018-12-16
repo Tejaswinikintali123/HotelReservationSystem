@@ -31,16 +31,19 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     @if (Convert.ToBoolean(ViewData["IsAdmin"]) == true)
                     {
                         <li><a asp-area="" asp-controller="Rooms" asp-action="Index">Rooms</a></li>
+                        <li><a asp-area="" asp-controller="CheckIn" asp-action="Index">Check In</a></li>
+                        <li><a asp-area="" asp-controller="CheckOut" asp-action="Index">Check Out</a></li>
+                    
                     }
                     @if (Convert.ToBoolean(ViewData["IsLoggedInUser"]) == true && Convert.ToBoolean(ViewData["IsAdmin"]) == false)
                     {
                         <li><a asp-area="" asp-controller="BookingDetails" asp-action="Index">My Bookings</a></li>
                     }
+                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
                 <partial name="_LoginPartial" />
             </div>

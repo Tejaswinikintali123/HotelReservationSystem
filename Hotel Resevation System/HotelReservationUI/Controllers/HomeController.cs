@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 namespace HotelReservationUI.Controllers
 {
     public class Search
-    { 
+    {   public int BookingID { get; set; }
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
         [DataType(DataType.Date)]
@@ -91,6 +91,22 @@ namespace HotelReservationUI.Controllers
                 return View(nameof(Confirmation), confirmationDetails);
             }
             return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SearchById([Bind("BookingID")] Search request)
+        {
+            try
+            {
+                
+                var details = _b.GetBookingDetails(request.BookingID);
+                return View(nameof(Confirmation), details);
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError(ex.Source, ex.Message);
+            }
+            return View(nameof(Index), request);
         }
 
         public IActionResult Confirmation()

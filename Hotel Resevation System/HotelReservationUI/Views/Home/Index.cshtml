@@ -3,81 +3,106 @@
     ViewData["Title"] = "Home Page";
 }
 
-
-
-<div class="row">
-    <p>
-        <h4>Search Rooms</h4>
-    </p>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <form asp-action="Search">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="col-md-4">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <input type="submit" value="Search" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
-</div>
-@if (Model != null && Model.Results != null && Model.Results.Count == 0)
+@if (Convert.ToBoolean(ViewData["IsAdmin"]) != true)
 {
+
     <div class="row">
-        No rooms Avaialable.
+        <p>
+            <h4>Search Rooms</h4>
+        </p>
     </div>
-}
-@if (Model != null && Model.Results != null && Model.Results.Count > 0)
-{
     <div class="row">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Type
-                    </th>
-                    <th>
-                        Price
-                    </th>
-                    <th>
-                        Count
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Results)
-                {
+        <div class="col-md-12">
+            <form asp-action="Search">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="col-md-4">
+                    <label asp-for="StartDate" class="control-label"></label>
+                    <input asp-for="StartDate" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="EndDate" class="control-label"></label>
+                    <input asp-for="EndDate" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <input type="submit" value="Search" class="btn btn-default" />
+                </div>
+            </form>
+        </div>
+    </div>
+    @if (Model != null && Model.Results != null && Model.Results.Count == 0)
+    {
+        <div class="row">
+            No rooms Avaialable.
+        </div>
+    }
+    @if (Model != null && Model.Results != null && Model.Results.Count > 0)
+    {
+        <div class="row">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Type)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.RoomPrice)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.AvailableRoomCount)
-                        </td>
-                        <td>
-                            @{
-                                var parms = new Dictionary<string, string>
-                                {
-                                    { "type", item.Type.ToString() }
-                                };
-                            }
-
-                            <a asp-action="BookRoom" asp-all-route-data="parms">Book</a>
-                        </td>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Price
+                        </th>
+                        <th>
+                            Count
+                        </th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RoomPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AvailableRoomCount)
+                            </td>
+                            <td>
+                                @{
+                                    var parms = new Dictionary<string, string>
+                                                                    {
+                                                                        { "type", item.Type.ToString() }
+                                                                    };
+                                }
+
+                                <a asp-action="BookRoom" asp-all-route-data="parms">Book</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="row">
+        <p>
+            <h4>Search By BookingID</h4>
+        </p>
     </div>
-}
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="SearchById">
+
+                <div class="col-md-4">
+                    <label asp-for="BookingID" class="control-label"></label>
+                    <input asp-for="BookingID" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <input type="submit" value="Search" class="btn btn-default" />
+                </div>
+            </form>
+        </div>
+    </div>
+                                    }else
+                                    {
+                                        <h3>Welcome Admin</h3>
+                                    }

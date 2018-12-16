@@ -1,0 +1,79 @@
+﻿@model HotelReservationUI.Models.CheckInModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Check In</h2>
+
+<div class="row">
+    <p>
+        <h4>Search By BookingID</h4>
+    </p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="SearchById">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="col-md-4">
+                <label asp-for="BookingId" class="control-label"></label>
+                <input asp-for="BookingId" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <input type="submit" value="Search" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+@if(Model != null && Model.RoomNo != 0)
+{
+<h3>CheckIn Completed. Assigned Room is  @Model.RoomNo</h3>
+}
+
+@if (Model != null && Model.Rooms != null && Model.Rooms.Count > 0)
+{
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Room Id
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Rooms)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @{
+                                var parms = new Dictionary<string, string>
+                                                        {
+                                                            { "bookingId", Model.BookingId.ToString() },
+                                                            { "roomId", item.ID.ToString()}
+                                                        };
+                            }
+
+                            <a asp-action="CheckInRoom" asp-all-route-data="parms">CheckIn</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
