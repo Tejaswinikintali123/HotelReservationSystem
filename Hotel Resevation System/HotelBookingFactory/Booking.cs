@@ -63,6 +63,7 @@ namespace HotelBookingFactory
             db.SaveChanges();
             return detailsResult.Entity;
         } 
+
         public List<CheckIn> GetAvailableRoomsForCheckOut()
         {
            return db.CheckIn.Where(x => x.CheckOutTime == null).Include(x=>x.Room).Include(x=>x.BookingDetails).ToList();
@@ -88,11 +89,38 @@ namespace HotelBookingFactory
             }
             return rooms;
         }
+        public List<BookingDetails> GetTodayBookings()
+        {
+            var bookings = new List<BookingDetails>();
+            bookings = this.db.BookingDetailsofRoom.Where(x => x.StartDate.Date == DateTime.Now.Date && x.Status==BookingStatus.Active).ToList();
+            return bookings;
+        }
+        public List<BookingDetails> GetHistory()
+        {
+            var bookings = new List<BookingDetails>();
+            bookings = this.db.BookingDetailsofRoom.Where(x =>( x.Status == BookingStatus.Cancelled) ||( x.Status == BookingStatus.Completed)).ToList();
+            return bookings;
+        }
+        public List<BookingDetails> GetHistory(DateTime startdate, DateTime enddate)
+        {
+            var bookings = new List<BookingDetails>();
+            bookings = this.db.BookingDetailsofRoom.Where(x => (x.Status == BookingStatus.Cancelled) || (x.Status == BookingStatus.Completed)).ToList();
+            return bookings;
+        }
+        public List<BookingDetails> GetHistory(DateTime startdate)
+        {
+            var bookings = new List<BookingDetails>();
+            bookings = this.db.BookingDetailsofRoom.Where(x=>(x.Status == BookingStatus.Completed)).ToList();
+            return bookings;
+        }
 
         public int CheckIn(int bookingId,int roomId)
         {
             var details = this.GetBookingDetails(bookingId);
-
+            if (details.Status == BookingStatus.Cancelled)
+            {
+                throw new BookingException("Booking already Cancelled.");
+            }
             var room = this.db.Rooms.Where(x => x.ID == roomId).FirstOrDefault();
             
             var checkIn = new CheckIn();
@@ -100,6 +128,8 @@ namespace HotelBookingFactory
             checkIn.RoomId = room.ID;
             checkIn.CheckInTime = DateTime.Now;
             db.CheckIn.Add(checkIn);
+            details.Status = BookingStatus.CheckedIn;
+            db.BookingDetailsofRoom.Update(details);
             db.SaveChanges();
             return room.RoomNo;
 
@@ -108,7 +138,7 @@ namespace HotelBookingFactory
         public int CheckIn(int bookingId)
         {
             var details = this.GetBookingDetails(bookingId);
-
+            
             var allRooms = this.db.Rooms.Where(x => x.Type == details.Type);
             Room room = allRooms.FirstOrDefault();
             foreach(var r in allRooms)
@@ -125,6 +155,8 @@ namespace HotelBookingFactory
             checkIn.RoomId = room.ID;
             checkIn.CheckInTime = DateTime.Now;
             db.CheckIn.Add(checkIn);
+            details.Status = BookingStatus.CheckedIn;
+            db.BookingDetailsofRoom.Update(details);
             db.SaveChanges();
             return room.RoomNo;
 
@@ -134,6 +166,9 @@ namespace HotelBookingFactory
             var room = this.db.Rooms.Where(x => x.RoomNo == roomNo).FirstOrDefault();
             var checkin = this.db.CheckIn.Where(x => x.RoomId == room.ID && x.CheckOutTime == null).FirstOrDefault();
             checkin.CheckOutTime = DateTime.Now;
+            var details = this.GetBookingDetails(checkin.BookingId);
+            details.Status = BookingStatus.Completed;
+            db.BookingDetailsofRoom.Update(details);
             db.SaveChanges();
         }
         public BookingDetails GetBookingDetails(int id)
@@ -149,6 +184,18 @@ namespace HotelBookingFactory
         public IEnumerable<BookingDetails> GetBookingDetails(string emailAddress)
         {
             var result = this.db.BookingDetailsofRoom.Where(x => x.EmailAddress.ToLower() == emailAddress.ToLower());
+            foreach(var booking in result)
+            {
+                //if(booking.IsCancelled != true)
+                //{
+                //    var checkIn = db.CheckIn.Where(x => x.BookingId == booking.ID).FirstOrDefault();
+                //    if(checkIn != null)
+                //    {
+                //        booking.IsCheckedIn = checkIn.CheckOutTime == null;
+                //        booking.IsCheckedOut = checkIn.CheckOutTime != null;
+                //    }
+                //}
+            }
             return result;
         }
 
@@ -163,7 +210,7 @@ namespace HotelBookingFactory
             this.ValidateDates(startDate, endDate);
             List<BookingSearchResult> results = new List<BookingSearchResult>();
             
-            var groupByBookingDetails = this.db.BookingDetailsofRoom.Where(x =>startDate>= x.StartDate.Date && endDate<= x.EndDate.Date ).GroupBy(x => x.Type)
+            var groupByBookingDetails = this.db.BookingDetailsofRoom.Where(x =>startDate>= x.StartDate.Date && endDate<= x.EndDate.Date && x.Status == BookingStatus.Active).GroupBy(x => x.Type)
                  .Select(y => new KeyValuePair<RoomType, int>(y.Key, y.Count()));
             foreach (var pair in this.groupByRoomList) {
                 var result = new BookingSearchResult();
@@ -175,6 +222,15 @@ namespace HotelBookingFactory
             }
             return results;
         }
+
+        public void CancelBooking(int bookingId)
+        {
+            var booking = this.db.BookingDetailsofRoom.Where(x => x.ID == bookingId).FirstOrDefault();
+            booking.Status = BookingStatus.Cancelled;
+            db.BookingDetailsofRoom.Update(booking);
+            db.SaveChanges();
+        }
+
         /// <summary>
         /// populate rooms with respective of nooffloors & noofroomsperfloor
         /// </summary>

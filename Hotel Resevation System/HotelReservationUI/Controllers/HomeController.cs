@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace HotelReservationUI.Controllers
 {
-    public class Search
+    public class Searchdate
     {   public int BookingID { get; set; }
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
@@ -41,7 +41,7 @@ namespace HotelReservationUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Search([Bind("StartDate,EndDate")] Search request)
+        public IActionResult Search([Bind("StartDate,EndDate")] Searchdate request)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +66,7 @@ namespace HotelReservationUI.Controllers
             b.StartDate = Convert.ToDateTime(TempData["StartDate"]);
             b.EndDate = Convert.ToDateTime(TempData["EndDate"]);
             b.Type = (RoomType)Enum.Parse(typeof(RoomType), type);
+            b.EmailAddress = HttpContext.User.Identity.Name;
             TempData["Type"] = type;
             return View(b);
         }
@@ -94,7 +95,7 @@ namespace HotelReservationUI.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SearchById([Bind("BookingID")] Search request)
+        public IActionResult SearchById([Bind("BookingID")] Searchdate request)
         {
             try
             {

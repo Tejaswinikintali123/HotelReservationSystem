@@ -36,7 +36,8 @@
                         <li><a asp-area="" asp-controller="Rooms" asp-action="Index">Rooms</a></li>
                         <li><a asp-area="" asp-controller="CheckIn" asp-action="Index">Check In</a></li>
                         <li><a asp-area="" asp-controller="CheckOut" asp-action="Index">Check Out</a></li>
-                    
+                        <li><a asp-area="" asp-controller="History" asp-action="Index">History</a></li>
+
                     }
                     @if (Convert.ToBoolean(ViewData["IsLoggedInUser"]) == true && Convert.ToBoolean(ViewData["IsAdmin"]) == false)
                     {

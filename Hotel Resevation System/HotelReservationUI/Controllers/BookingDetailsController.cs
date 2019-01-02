@@ -26,5 +26,13 @@ namespace HotelReservationUI.Controllers
             var result = _b.GetBookingDetails(HttpContext.User.Identity.Name);
             return View(result);
         }
+
+        public IActionResult Cancel(string id)
+        {
+            _b.CancelBooking(Convert.ToInt32(id));
+            var result = _b.GetBookingDetails(HttpContext.User.Identity.Name);
+            return View(nameof(Index), result);
+        }
+
     }
 }

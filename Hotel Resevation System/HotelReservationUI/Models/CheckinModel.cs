@@ -13,5 +13,6 @@ namespace HotelReservationUI.Models
         public int BookingId { get; set; }
 
         public List<Room> Rooms { get; set; }
+        public List<BookingDetails> Bookings { get; set; }
     }
 }

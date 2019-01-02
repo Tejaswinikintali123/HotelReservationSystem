@@ -25,9 +25,9 @@
         </form>
     </div>
 </div>
-@if(Model != null && Model.RoomNo != 0)
+@if (Model != null && Model.RoomNo != 0)
 {
-<h3>CheckIn Completed. Assigned Room is  @Model.RoomNo</h3>
+    <h3>CheckIn Completed. Assigned Room is  @Model.RoomNo</h3>
 }
 
 @if (Model != null && Model.Rooms != null && Model.Rooms.Count > 0)
@@ -63,13 +63,61 @@
                         <td>
                             @{
                                 var parms = new Dictionary<string, string>
-                                                        {
-                                                            { "bookingId", Model.BookingId.ToString() },
-                                                            { "roomId", item.ID.ToString()}
-                                                        };
+                                                                    {
+                                                                        { "bookingId", Model.BookingId.ToString() },
+                                                                        { "roomId", item.ID.ToString()}
+                                                                    };
                             }
 
                             <a asp-action="CheckInRoom" asp-all-route-data="parms">CheckIn</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@if (Model != null && Model.Bookings != null && Model.Bookings.Count > 0)
+{
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Booking Id
+                    </th>
+                    <th>
+                        Email 
+                    </th>
+                    <th>
+                        Room Type
+                    </th>
+                   <th>
+
+                   </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Bookings)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EmailAddress)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @{
+                                var parms = new Dictionary<string, string>
+                                                                    {
+                                                                        { "bookingId", item.ID.ToString() }
+                                                                    };
+                            }
+                            <a asp-action="Search" asp-all-route-data="parms">search</a>
                         </td>
                     </tr>
                 }

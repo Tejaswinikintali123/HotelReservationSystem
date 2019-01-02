@@ -20,7 +20,9 @@ namespace HotelReservationUI.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var model = new CheckInModel();
+            model.Bookings = _b.GetTodayBookings();
+            return View(model);
         }
 
         [HttpPost]
@@ -38,6 +40,21 @@ namespace HotelReservationUI.Controllers
             }
             return View(nameof(Index), checkInModel);
         }
+        public IActionResult Search(string bookingId)
+        {
+            var model = new CheckInModel();
+            try
+            {
+                model.BookingId = Convert.ToInt32(bookingId);
+                model.Rooms = _b.GetAvailableRoomsForCheckin(model.BookingId);
+                return View(nameof(Index), model);
+            }
+            catch (BookingException ex)
+            {
+                ModelState.AddModelError(ex.Source, ex.Message);
+            }
+            return View(nameof(Index), model);
+        }
 
 
 
@@ -45,10 +62,18 @@ namespace HotelReservationUI.Controllers
         {
             var model = new CheckInModel();
             model.BookingId = Convert.ToInt32(bookingId);
-            model.Rooms = null;
+            
             model.RoomId = Convert.ToInt32(roomId);
-
-            model.RoomNo = _b.CheckIn(model.BookingId, model.RoomId);
+            try
+            {
+                model.RoomNo = _b.CheckIn(model.BookingId, model.RoomId);
+                model.Rooms = null;
+            } 
+            catch(BookingException ex)
+            {
+                ModelState.AddModelError(ex.Source, ex.Message);
+            }
+            
             return View(nameof(Index), model);
         }
     }
